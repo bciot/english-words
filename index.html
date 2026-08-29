@@ -2,780 +2,399 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0a1730" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0a1630" />
   <title>单词神器</title>
   <style>
     :root{
-      --bg:#08101d;
-      --card:#0f1d38;
-      --card2:#102347;
-      --border:#294677;
-      --text:#f8fbff;
-      --sub:#b2c0d8;
-      --accent:#79a9ff;
-      --accent2:#4c8dff;
-      --ok:#38c993;
-      --danger:#f06d6d;
-      --chip:#11284d;
-      --chip-active:#1b4fa5;
+      --bg:#07101d; --panel:#0f1d38; --border:#284676; --text:#f8fbff; --sub:#aebbd3;
+      --accent:#7cb0ff; --accent2:#4d8dff; --ok:#38c993; --danger:#f06d6d;
+      --chip:#11284d; --chip-active:#2153a6;
     }
     *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:linear-gradient(180deg,#07101c 0%,#0a1630 100%);
-      color:var(--text);
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    }
-    .wrap{
-      max-width:860px;
-      margin:0 auto;
-      padding:10px 12px 20px;
-    }
-    .panel{
-      background:rgba(15,29,56,.96);
-      border:1px solid var(--border);
-      border-radius:22px;
-      padding:14px;
-      box-shadow:0 10px 28px rgba(0,0,0,.18);
-      margin-bottom:12px;
-    }
-    .section-mark{
-      color:#8cb8ff;
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.8px;
-      margin-bottom:8px;
-    }
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:linear-gradient(180deg,#07101c 0%,#0a1730 100%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0) 0}
+    .app{width:100%;height:100dvh;max-width:920px;margin:0 auto;padding:8px;display:grid;grid-template-rows:.55fr .95fr 1.65fr .42fr .78fr .58fr .34fr;gap:8px;overflow:hidden}
+    .panel{background:rgba(15,29,56,.97);border:1px solid var(--border);border-radius:18px;box-shadow:0 8px 24px rgba(0,0,0,.16);overflow:hidden;min-height:0}
+    .inner{padding:10px 12px;height:100%}
+    .mark{font-size:11px;font-weight:800;color:#8eb7ff;letter-spacing:.5px;margin-bottom:5px;line-height:1.1}
 
-    /* A 区：缩小 */
-    .a-panel{
-      padding:12px 14px;
-      text-align:center;
-    }
-    .a-title{
-      margin:0 0 4px;
-      font-size:22px;
-      font-weight:800;
-    }
-    .a-desc{
-      margin:0 0 8px;
-      font-size:14px;
-      color:var(--sub);
-    }
-    .voice-badge{
-      display:inline-block;
-      border:1px solid var(--border);
-      border-radius:999px;
-      padding:7px 12px;
-      font-size:13px;
-      font-weight:700;
-      color:#8eb5ff;
-      background:rgba(79,140,255,.08);
-    }
+    .a-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:4px;text-align:center}
+    .title{margin:0;font-size:18px;line-height:1.1;font-weight:900}
+    .desc{font-size:12px;color:var(--sub);line-height:1.2;margin:0}
+    .badge{display:inline-block;font-size:12px;font-weight:800;color:#8eb7ff;border:1px solid var(--border);border-radius:999px;padding:5px 10px;background:rgba(76,141,255,.08);line-height:1.1}
 
-    /* B 区：放大 */
-    .b-panel{
-      padding:16px 14px 18px;
-    }
-    .b-title{
-      text-align:center;
-      color:#8eb5ff;
-      font-size:15px;
-      font-weight:800;
-      margin-bottom:8px;
-    }
-    .b-subtitle{
-      text-align:center;
-      color:var(--sub);
-      font-size:14px;
-      margin-bottom:8px;
-    }
-    .big-word{
-      min-height:150px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      font-size:clamp(54px,10vw,108px);
-      font-weight:900;
-      line-height:1.0;
-      color:#ffffff;
-      letter-spacing:1px;
-      word-break:break-word;
-      padding:4px 2px;
-    }
-    .big-meaning{
-      text-align:center;
-      min-height:26px;
-      color:#9fc1ff;
-      font-size:20px;
-      margin-top:2px;
-    }
-    .big-tip{
-      text-align:center;
-      color:var(--sub);
-      font-size:13px;
-      margin-top:6px;
-    }
+    .b-wrap{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:6px 10px 10px}
+    .b-top{font-size:13px;color:#8eb7ff;font-weight:800;margin-bottom:4px;line-height:1.1}
+    .b-mid{font-size:13px;color:var(--sub);margin-bottom:6px;line-height:1.1}
+    .big-word{width:100%;flex:1;display:flex;align-items:center;justify-content:center;font-size:clamp(58px,13vw,112px);line-height:.95;font-weight:900;letter-spacing:1px;word-break:break-word;overflow:hidden}
+    .big-meaning{font-size:16px;color:#9dc0ff;line-height:1.1;min-height:18px;margin-top:4px}
 
-    /* C 区：大比例 */
-    .c-panel{
-      padding:14px;
-    }
-    .word-row{
-      display:grid;
-      grid-template-columns:48px 1fr 120px 62px;
-      gap:10px;
-      align-items:center;
-      margin-bottom:12px;
-    }
-    .num{
-      width:42px;height:42px;border-radius:999px;
-      background:#15386d;color:#a8c7ff;
-      display:grid;place-items:center;
-      font-size:22px;font-weight:800;
-      margin:0 auto;
-    }
-    .word-box{
-      display:grid;
-      gap:8px;
-    }
-    input, select{
-      width:100%;
-      background:transparent;
-      color:var(--text);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:17px;
-      outline:none;
-    }
-    input:focus, select:focus{border-color:var(--accent2)}
-    .meaning-input{
-      font-size:14px;
-      color:#cfe0ff;
-      padding:10px 12px;
-    }
-    .single-loop-box{
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:10px 8px;
-      text-align:center;
-      background:rgba(20,38,70,.45);
-    }
-    .single-loop-box .label{
-      font-size:12px;
-      color:var(--sub);
-      margin-bottom:8px;
-      font-weight:700;
-    }
-    .switch{
-      position:relative;
-      display:inline-block;
-      width:54px;
-      height:30px;
-    }
+    .c-wrap{height:100%;display:flex;flex-direction:column}
+    .rows{display:flex;flex-direction:column;gap:7px;flex:1;min-height:0}
+    .row{display:grid;grid-template-columns:30px minmax(96px,1.2fr) minmax(64px,.9fr) 64px 42px;gap:6px;align-items:center;min-height:0}
+    .num{width:30px;height:30px;border-radius:999px;display:grid;place-items:center;background:#15386d;color:#a8c7ff;font-size:18px;font-weight:900}
+    .text-input{width:100%;height:36px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--text);outline:none;padding:0 10px;font-size:16px}
+    .text-input:focus{border-color:var(--accent2)}
+    .meaning-input{color:#d3e1ff;font-size:14px}
+    .loop-cell{height:36px;border:1px solid var(--border);border-radius:12px;display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(20,38,70,.42);padding:0 4px}
+    .loop-txt{font-size:10px;color:var(--sub);font-weight:800;line-height:1}
+    .switch{position:relative;width:34px;height:20px;display:inline-block}
     .switch input{display:none}
-    .slider{
-      position:absolute;cursor:pointer;inset:0;
-      background:#344663;border-radius:999px;
-      transition:.2s;
-      border:1px solid #45608e;
-    }
-    .slider:before{
-      content:"";
-      position:absolute;
-      width:22px;height:22px;
-      left:4px;top:3px;
-      background:white;border-radius:50%;
-      transition:.2s;
-    }
-    .switch input:checked + .slider{
-      background:#3a8cff;
-    }
-    .switch input:checked + .slider:before{
-      transform:translateX(23px);
-    }
-    .speak-one{
-      min-height:48px;
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--text);
-      border-radius:14px;
-      font-size:24px;
-      cursor:pointer;
-    }
+    .slider{position:absolute;inset:0;border-radius:999px;background:#3a4b67;border:1px solid #4d648f;transition:.2s;cursor:pointer}
+    .slider:before{content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;border-radius:50%;background:#fff;transition:.2s}
+    .switch input:checked + .slider{background:#3b8fff}
+    .switch input:checked + .slider:before{transform:translateX(14px)}
+    .speak-btn{width:42px;height:36px;border:1px solid var(--border);border-radius:12px;background:transparent;color:var(--text);font-size:20px;cursor:pointer}
 
-    .controls-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:10px;
-    }
-    button.main{
-      border:0;border-radius:14px;
-      padding:15px 16px;
-      font-size:18px;font-weight:800;
-      color:white;cursor:pointer;
-    }
-    #startBtn{background:var(--ok)}
-    #stopBtn{background:var(--danger)}
+    .d-wrap{height:100%;display:flex;align-items:center;justify-content:flex-start;font-size:13px;line-height:1.25;color:#d7e3ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .d-wrap b{color:#81afff}
+    .d-line{width:100%;overflow:hidden;text-overflow:ellipsis}
 
-    .sub-controls{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-      margin-top:12px;
-    }
-    .sub-btn{
-      border:1px solid var(--border);
-      background:transparent;
-      color:var(--text);
-      border-radius:12px;
-      padding:11px 10px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-    }
+    .e-wrap{height:100%;display:flex;flex-direction:column;gap:8px}
+    .btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .btn-sub-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+    .main-btn,.sub-btn{border:0;border-radius:13px;font-weight:900;color:#fff;cursor:pointer}
+    .main-btn{height:42px;font-size:16px}
+    .sub-btn{height:34px;font-size:13px;border:1px solid var(--border);background:transparent;color:var(--text)}
+    #startBtn{background:var(--ok)} #stopBtn{background:var(--danger)}
 
-    .settings-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:8px;
-    }
-    .field label{
-      display:block;
-      font-size:13px;
-      color:var(--sub);
-      margin-bottom:6px;
-    }
+    .f-wrap{height:100%;display:flex;flex-direction:column;gap:6px}
+    .f-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    .f-title{font-size:14px;font-weight:900;color:#8eb7ff;line-height:1.1}
+    .f-tip{font-size:12px;color:var(--sub);line-height:1.1;white-space:nowrap}
+    .chips{flex:1;min-height:0;display:flex;align-items:center;gap:6px;overflow-x:auto;overflow-y:hidden;padding-bottom:2px;scrollbar-width:none}
+    .chips::-webkit-scrollbar{display:none}
+    .chip{flex:0 0 auto;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--border);background:var(--chip);color:#edf4ff;font-size:13px;cursor:pointer}
+    .chip.selected{background:var(--chip-active);border-color:#92baff}
+    .empty{font-size:12px;color:var(--sub);line-height:1.2;white-space:nowrap}
 
-    .d-panel{
-      padding:12px 14px;
-    }
-    .voice-info{
-      color:#d8e4ff;
-      font-size:15px;
-      line-height:1.55;
-    }
-    .voice-info b{color:#79a9ff}
+    .g-wrap{height:100%;display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .status{font-size:13px;color:#d9e4fb;font-weight:700;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mini-note{font-size:11px;color:var(--sub);line-height:1.1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-    .f-panel{
-      padding:12px 14px;
-    }
-    .f-title{
-      margin:0 0 6px;
-      color:#8eb5ff;
-      font-size:16px;
-    }
-    .f-desc{
-      margin:0 0 10px;
-      color:var(--sub);
-      font-size:13px;
-    }
-    .chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      min-height:34px;
-    }
-    .chip{
-      border:1px solid var(--border);
-      background:var(--chip);
-      color:#eef4ff;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:15px;
-      cursor:pointer;
-    }
-    .chip.selected{
-      background:var(--chip-active);
-      border-color:#8fb8ff;
-    }
-    .empty{
-      color:var(--sub);
-      font-size:14px;
-    }
-
-    /* G 区：缩小 */
-    .g-panel{
-      padding:10px 14px;
-    }
-    .status{
-      text-align:center;
-      color:#d0ddf6;
-      font-size:14px;
-      min-height:20px;
-      margin-bottom:8px;
-    }
-    .tiny-note{
-      color:var(--sub);
-      font-size:12px;
-      line-height:1.55;
-    }
-
-    @media (max-width:760px){
-      .word-row{
-        grid-template-columns:42px 1fr 98px 54px;
-      }
-    }
-    @media (max-width:640px){
-      .word-row{
-        grid-template-columns:42px 1fr 56px;
-        align-items:start;
-      }
-      .single-loop-box{
-        grid-column:2 / 3;
-      }
-      .settings-grid,.controls-grid,.sub-controls{
-        grid-template-columns:1fr;
-      }
+    @media (max-width:430px){
+      .app{padding:6px;gap:6px}
+      .panel{border-radius:16px}
+      .inner{padding:8px 10px}
+      .title{font-size:17px}
+      .big-word{font-size:clamp(52px,13vw,92px)}
+      .row{grid-template-columns:28px minmax(88px,1.25fr) minmax(56px,.85fr) 60px 40px;gap:5px}
+      .text-input{height:34px;font-size:15px;padding:0 8px}
+      .meaning-input{font-size:13px}
+      .num{width:28px;height:28px;font-size:17px}
+      .loop-cell{height:34px}
+      .speak-btn{width:40px;height:34px}
+      .main-btn{height:40px}
+      .sub-btn{height:32px;font-size:12px}
+      .d-wrap{font-size:12px}
+      .status{font-size:12px}
+      .mini-note{font-size:10px}
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <!-- A 区 -->
-    <div class="panel a-panel">
-      <div class="section-mark">A 区 · 顶部信息（缩小显示）</div>
-      <h1 class="a-title">每日 4 个英语单词</h1>
-      <div class="a-desc">输入 4 个单词，点击开始后自动循环朗读。</div>
-      <div class="voice-badge">🇺🇸 指定发音：美式英语 English (United States)</div>
-    </div>
+  <div class="app">
+    <section class="panel"><div class="inner a-wrap">
+      <div class="mark">A 区 · 顶部信息（继续缩小）</div>
+      <h1 class="title">每日 4 个英语单词</h1>
+      <p class="desc">输入 4 个单词，点击开始后自动循环朗读</p>
+      <div class="badge">🇺🇸 指定发音：美式英语 English (United States)</div>
+    </div></section>
 
-    <!-- B 区 -->
-    <div class="panel b-panel">
-      <div class="section-mark">B 区 · 当前朗读大字区（更夸张、更醒目）</div>
-      <div class="b-title">当前读到的单词</div>
-      <div class="b-subtitle">大字记忆为主，中文释义只做小提示</div>
-      <div class="big-word" id="bigWord">准备开始</div>
-      <div class="big-meaning" id="bigMeaning">（中文释义会显示在这里）</div>
-      <div class="big-tip">开始后会在这里巨大显示，方便一眼记忆</div>
-    </div>
+    <section class="panel"><div class="inner b-wrap">
+      <div class="mark">B 区 · 当前单词显示区（横向最大化）</div>
+      <div class="b-top">当前读到的单词</div>
+      <div class="b-mid">英文大字为主，中文释义小字提示</div>
+      <div class="big-word" id="bigWord">READY</div>
+      <div class="big-meaning" id="bigMeaning">准备开始</div>
+    </div></section>
 
-    <!-- C 区 -->
-    <div class="panel c-panel">
-      <div class="section-mark">C 区 · 单词编辑与单循环区（大比例）</div>
-
-      <div class="word-row">
-        <div class="num">1</div>
-        <div class="word-box">
-          <input id="w1" type="text" value="apple" autocomplete="off" autocapitalize="none" />
-          <input id="m1" class="meaning-input" type="text" value="苹果" placeholder="中文释义（小提示）" />
+    <section class="panel"><div class="inner c-wrap">
+      <div class="mark">C 区 · 每行：序号 / 单词 / 中文 / 单循环 / 喇叭</div>
+      <div class="rows">
+        <div class="row">
+          <div class="num">1</div>
+          <input id="w1" class="text-input" type="text" value="apple" autocomplete="off" autocapitalize="none" />
+          <input id="m1" class="text-input meaning-input" type="text" value="苹果" placeholder="中文" />
+          <div class="loop-cell"><span class="loop-txt">单循</span><label class="switch"><input type="checkbox" class="single-loop" data-index="0"><span class="slider"></span></label></div>
+          <button class="speak-btn" data-target="0" aria-label="朗读第1个单词">🔊</button>
         </div>
-        <div class="single-loop-box">
-          <div class="label">单循环</div>
-          <label class="switch">
-            <input type="checkbox" class="single-loop" data-index="0">
-            <span class="slider"></span>
-          </label>
+        <div class="row">
+          <div class="num">2</div>
+          <input id="w2" class="text-input" type="text" value="beautiful" autocomplete="off" autocapitalize="none" />
+          <input id="m2" class="text-input meaning-input" type="text" value="美丽的" placeholder="中文" />
+          <div class="loop-cell"><span class="loop-txt">单循</span><label class="switch"><input type="checkbox" class="single-loop" data-index="1"><span class="slider"></span></label></div>
+          <button class="speak-btn" data-target="1" aria-label="朗读第2个单词">🔊</button>
         </div>
-        <button class="speak-one" data-target="0" aria-label="朗读第1个单词">🔊</button>
-      </div>
-
-      <div class="word-row">
-        <div class="num">2</div>
-        <div class="word-box">
-          <input id="w2" type="text" value="beautiful" autocomplete="off" autocapitalize="none" />
-          <input id="m2" class="meaning-input" type="text" value="美丽的" placeholder="中文释义（小提示）" />
+        <div class="row">
+          <div class="num">3</div>
+          <input id="w3" class="text-input" type="text" value="future" autocomplete="off" autocapitalize="none" />
+          <input id="m3" class="text-input meaning-input" type="text" value="未来" placeholder="中文" />
+          <div class="loop-cell"><span class="loop-txt">单循</span><label class="switch"><input type="checkbox" class="single-loop" data-index="2"><span class="slider"></span></label></div>
+          <button class="speak-btn" data-target="2" aria-label="朗读第3个单词">🔊</button>
         </div>
-        <div class="single-loop-box">
-          <div class="label">单循环</div>
-          <label class="switch">
-            <input type="checkbox" class="single-loop" data-index="1">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <button class="speak-one" data-target="1" aria-label="朗读第2个单词">🔊</button>
-      </div>
-
-      <div class="word-row">
-        <div class="num">3</div>
-        <div class="word-box">
-          <input id="w3" type="text" value="future" autocomplete="off" autocapitalize="none" />
-          <input id="m3" class="meaning-input" type="text" value="未来" placeholder="中文释义（小提示）" />
-        </div>
-        <div class="single-loop-box">
-          <div class="label">单循环</div>
-          <label class="switch">
-            <input type="checkbox" class="single-loop" data-index="2">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <button class="speak-one" data-target="2" aria-label="朗读第3个单词">🔊</button>
-      </div>
-
-      <div class="word-row">
-        <div class="num">4</div>
-        <div class="word-box">
-          <input id="w4" type="text" value="remember" autocomplete="off" autocapitalize="none" />
-          <input id="m4" class="meaning-input" type="text" value="记住" placeholder="中文释义（小提示）" />
-        </div>
-        <div class="single-loop-box">
-          <div class="label">单循环</div>
-          <label class="switch">
-            <input type="checkbox" class="single-loop" data-index="3">
-            <span class="slider"></span>
-          </label>
-        </div>
-        <button class="speak-one" data-target="3" aria-label="朗读第4个单词">🔊</button>
-      </div>
-
-      <div class="settings-grid">
-        <div class="field">
-          <label for="gap">单词间隔</label>
-          <select id="gap">
-            <option value="500">0.5 秒</option>
-            <option value="1000" selected>1 秒</option>
-            <option value="1500">1.5 秒</option>
-            <option value="2000">2 秒</option>
-            <option value="3000">3 秒</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="rate">朗读速度</label>
-          <select id="rate">
-            <option value="0.65">很慢</option>
-            <option value="0.8">慢</option>
-            <option value="0.95" selected>正常偏慢</option>
-            <option value="1.0">正常</option>
-            <option value="1.15">稍快</option>
-          </select>
+        <div class="row">
+          <div class="num">4</div>
+          <input id="w4" class="text-input" type="text" value="remember" autocomplete="off" autocapitalize="none" />
+          <input id="m4" class="text-input meaning-input" type="text" value="记住" placeholder="中文" />
+          <div class="loop-cell"><span class="loop-txt">单循</span><label class="switch"><input type="checkbox" class="single-loop" data-index="3"><span class="slider"></span></label></div>
+          <button class="speak-btn" data-target="3" aria-label="朗读第4个单词">🔊</button>
         </div>
       </div>
+    </div></section>
 
-      <div class="controls-grid">
-        <button id="startBtn" class="main">▶ 开始循环</button>
-        <button id="stopBtn" class="main">■ 停止</button>
+    <section class="panel"><div class="inner d-wrap">
+      <div class="d-line"><span class="mark" style="display:inline; margin-right:8px;">D 区 · 语音信息</span>发音语言：<b>en-US（美式英语）</b>　|　当前设备语音：<b id="voiceName">正在检测...</b></div>
+    </div></section>
+
+    <section class="panel"><div class="inner e-wrap">
+      <div class="mark">E 区 · 全局控制区</div>
+      <div class="btn-row">
+        <button id="startBtn" class="main-btn">▶ 开始循环</button>
+        <button id="stopBtn" class="main-btn">■ 停止</button>
       </div>
-
-      <div class="sub-controls">
-        <button id="saveLearnedBtn" class="sub-btn">加入已学过</button>
-        <button id="removeSelectedBtn" class="sub-btn">删除选中</button>
-        <button id="clearLearnedBtn" class="sub-btn">清空已学过</button>
+      <div class="btn-sub-row">
+        <button id="saveLearnedBtn" class="sub-btn">加入已学</button>
+        <button id="removeSelectedBtn" class="sub-btn">删选中</button>
+        <button id="clearLearnedBtn" class="sub-btn">清空已学</button>
       </div>
-    </div>
+    </div></section>
 
-    <!-- D 区 -->
-    <div class="panel d-panel">
-      <div class="section-mark">D 区 · 语音信息</div>
-      <div class="voice-info">
-        发音语言：<b>en-US（美式英语）</b><br>
-        当前设备语音：<b id="voiceName">正在检测...</b>
-      </div>
-    </div>
+    <section class="panel"><div class="inner f-wrap">
+      <div class="mark">F 区 · 已学过单词</div>
+      <div class="f-head"><div class="f-title">已学过的单词</div><div class="f-tip">自动本地保存</div></div>
+      <div class="chips" id="learnedList"></div>
+    </div></section>
 
-    <!-- F 区 -->
-    <div class="panel f-panel">
-      <div class="section-mark">F 区 · 已学过单词</div>
-      <h3 class="f-title">已学过的单词（可选中）</h3>
-      <p class="f-desc">点击单词可选中，再用上面的“删除选中”。自动保存在浏览器本地。</p>
-      <div id="learnedList" class="chips"></div>
-    </div>
-
-    <!-- G 区 -->
-    <div class="panel g-panel">
-      <div class="section-mark">G 区 · 状态与说明（缩小显示）</div>
+    <section class="panel"><div class="inner g-wrap">
       <div class="status" id="status">准备好了</div>
-      <div class="tiny-note">
-        说明：固定使用 en-US。<br>
-        若某一行开启“单循环”，点击开始后只循环该单词。<br>
-        中文释义仅作小提示，主要记忆仍以英文大字为主。
-      </div>
-    </div>
+      <div class="mini-note">尽量做成一整屏，不超屏；如个别机型差异，可再微调</div>
+    </div></section>
   </div>
 
   <script>
-    const wordInputs = [0,1,2,3].map(i => document.getElementById("w" + (i+1)));
-    const meaningInputs = [0,1,2,3].map(i => document.getElementById("m" + (i+1)));
-    const singleLoopEls = Array.from(document.querySelectorAll(".single-loop"));
-    const gapEl = document.getElementById("gap");
-    const rateEl = document.getElementById("rate");
-    const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
+    const wordInputs = [1,2,3,4].map(i => document.getElementById("w" + i));
+    const meaningInputs = [1,2,3,4].map(i => document.getElementById("m" + i));
+    const loopEls = Array.from(document.querySelectorAll(".single-loop"));
     const voiceNameEl = document.getElementById("voiceName");
     const bigWordEl = document.getElementById("bigWord");
     const bigMeaningEl = document.getElementById("bigMeaning");
-    const statusEl = document.getElementById("status");
     const learnedListEl = document.getElementById("learnedList");
+    const statusEl = document.getElementById("status");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
     const saveLearnedBtn = document.getElementById("saveLearnedBtn");
     const removeSelectedBtn = document.getElementById("removeSelectedBtn");
     const clearLearnedBtn = document.getElementById("clearLearnedBtn");
 
+    let voices = [];
     let running = false;
     let loopToken = 0;
-    let voices = [];
     let currentIndex = null;
+    let singleLoopIndex = null;
     let learnedWords = [];
     let selectedLearned = [];
-    let singleLoopIndex = null;
 
-    function normalize(s){ return (s || "").trim(); }
+    function normalize(v){ return (v || "").trim(); }
 
-    function loadVoices(){
-      voices = speechSynthesis.getVoices();
-      updateVoiceDisplay();
-    }
-
+    function loadVoices(){ voices = speechSynthesis.getVoices(); updateVoiceDisplay(); }
     function getUSVoice(){
       return (
         voices.find(v => /^en-US$/i.test(v.lang) && /Samantha|Ava|Allison|Susan|Alex|Joelle|Nicky|Aaron|Mark/i.test(v.name)) ||
-        voices.find(v => /^en-US$/i.test(v.lang)) ||
-        null
+        voices.find(v => /^en-US$/i.test(v.lang)) || null
       );
     }
-
     function updateVoiceDisplay(){
       const v = getUSVoice();
-      if(v) voiceNameEl.textContent = `${v.name} (${v.lang})`;
-      else voiceNameEl.textContent = "系统默认美式英语（en-US）";
+      voiceNameEl.textContent = v ? `${v.name} (${v.lang})` : "系统默认美式英语（en-US）";
     }
-
     loadVoices();
-    if("onvoiceschanged" in speechSynthesis){
-      speechSynthesis.onvoiceschanged = loadVoices;
-    }
+    if ("onvoiceschanged" in speechSynthesis) speechSynthesis.onvoiceschanged = loadVoices;
 
     function saveState(){
-      const data = {
-        words: wordInputs.map(i => i.value),
-        meanings: meaningInputs.map(i => i.value),
-        gap: gapEl.value,
-        rate: rateEl.value,
-        learnedWords,
-        singleLoopIndex
-      };
-      localStorage.setItem("word神器_layout_v2", JSON.stringify(data));
+      const data = { words: wordInputs.map(i => i.value), meanings: meaningInputs.map(i => i.value), singleLoopIndex, learnedWords };
+      localStorage.setItem("word_magic_fullscreen_v1", JSON.stringify(data));
     }
 
     function restoreState(){
       try{
-        const raw = localStorage.getItem("word神器_layout_v2");
+        const raw = localStorage.getItem("word_magic_fullscreen_v1");
         if(!raw) return;
         const data = JSON.parse(raw);
-
-        if(Array.isArray(data.words)){
-          data.words.forEach((v,i)=>{ if(typeof v === "string" && wordInputs[i]) wordInputs[i].value = v; });
-        }
-        if(Array.isArray(data.meanings)){
-          data.meanings.forEach((v,i)=>{ if(typeof v === "string" && meaningInputs[i]) meaningInputs[i].value = v; });
-        }
-        if(data.gap) gapEl.value = data.gap;
-        if(data.rate) rateEl.value = data.rate;
-        if(Array.isArray(data.learnedWords)) learnedWords = data.learnedWords;
+        if(Array.isArray(data.words)) data.words.forEach((v,i) => { if(wordInputs[i]) wordInputs[i].value = v; });
+        if(Array.isArray(data.meanings)) data.meanings.forEach((v,i) => { if(meaningInputs[i]) meaningInputs[i].value = v; });
         if(Number.isInteger(data.singleLoopIndex)) singleLoopIndex = data.singleLoopIndex;
+        if(Array.isArray(data.learnedWords)) learnedWords = data.learnedWords;
       }catch(e){}
     }
 
-    restoreState();
+    function syncLoopUI(){ loopEls.forEach((el, idx) => el.checked = (idx === singleLoopIndex)); }
 
-    function syncSingleLoopUI(){
-      singleLoopEls.forEach((el, idx) => {
-        el.checked = (singleLoopIndex === idx);
-      });
-    }
-    syncSingleLoopUI();
-
-    function renderLearnedWords(){
+    function renderLearned(){
       learnedListEl.innerHTML = "";
       if(learnedWords.length === 0){
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = "还没有保存“已学过”的单词";
-        learnedListEl.appendChild(empty);
+        const div = document.createElement("div");
+        div.className = "empty";
+        div.textContent = "还没有保存“已学过”的单词";
+        learnedListEl.appendChild(div);
         return;
       }
-
       learnedWords.forEach(item => {
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "chip" + (selectedLearned.includes(item.word) ? " selected" : "");
-        chip.textContent = item.meaning ? `${item.word} · ${item.meaning}` : item.word;
-        chip.addEventListener("click", () => {
-          if(selectedLearned.includes(item.word)){
-            selectedLearned = selectedLearned.filter(w => w !== item.word);
-          }else{
-            selectedLearned.push(item.word);
-          }
-          renderLearnedWords();
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "chip" + (selectedLearned.includes(item.word) ? " selected" : "");
+        btn.textContent = item.meaning ? `${item.word}·${item.meaning}` : item.word;
+        btn.addEventListener("click", () => {
+          if(selectedLearned.includes(item.word)) selectedLearned = selectedLearned.filter(w => w !== item.word);
+          else selectedLearned.push(item.word);
+          renderLearned();
         });
-        learnedListEl.appendChild(chip);
+        learnedListEl.appendChild(btn);
       });
     }
-    renderLearnedWords();
 
-    [...wordInputs, ...meaningInputs].forEach(i => i.addEventListener("input", saveState));
-    gapEl.addEventListener("change", saveState);
-    rateEl.addEventListener("change", saveState);
-
-    singleLoopEls.forEach(el => {
-      el.addEventListener("change", () => {
-        const idx = parseInt(el.dataset.index, 10);
-        if(el.checked){
-          singleLoopIndex = idx;
-        }else{
-          singleLoopIndex = null;
-        }
-        syncSingleLoopUI();
-        saveState();
-      });
-    });
-
-    function updateBigDisplay(idx){
+    function updateBig(idx){
       currentIndex = idx;
       if(idx === null || idx === undefined){
-        bigWordEl.textContent = "准备开始";
-        bigMeaningEl.textContent = "（中文释义会显示在这里）";
+        bigWordEl.textContent = "READY";
+        bigMeaningEl.textContent = "准备开始";
         return;
       }
-      const word = normalize(wordInputs[idx].value);
-      const meaning = normalize(meaningInputs[idx].value);
-      bigWordEl.textContent = word || "（空）";
-      bigMeaningEl.textContent = meaning || "（无中文释义）";
+      const w = normalize(wordInputs[idx].value);
+      const m = normalize(meaningInputs[idx].value);
+      bigWordEl.textContent = w || "EMPTY";
+      bigMeaningEl.textContent = m || "无中文释义";
     }
 
-    function sleep(ms){
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
 
     function speakIndex(idx){
       return new Promise(resolve => {
         const word = normalize(wordInputs[idx].value);
         if(!word){ resolve(); return; }
-
         speechSynthesis.cancel();
-        updateBigDisplay(idx);
+        updateBig(idx);
 
-        const u = new SpeechSynthesisUtterance(word);
-        u.lang = "en-US";
-        u.rate = parseFloat(rateEl.value);
-        u.pitch = 1.0;
-
+        const utter = new SpeechSynthesisUtterance(word);
+        utter.lang = "en-US";
+        utter.rate = 0.95;
+        utter.pitch = 1.0;
         const v = getUSVoice();
-        if(v){
-          u.voice = v;
-          voiceNameEl.textContent = `${v.name} (${v.lang})`;
-        }else{
-          voiceNameEl.textContent = "系统默认美式英语（en-US）";
-        }
+        if(v) utter.voice = v;
 
         let done = false;
-        const finish = () => {
-          if(!done){
-            done = true;
-            resolve();
-          }
-        };
-        u.onend = finish;
-        u.onerror = finish;
-
-        speechSynthesis.speak(u);
+        const finish = () => { if(!done){ done = true; resolve(); } };
+        utter.onend = finish;
+        utter.onerror = finish;
+        speechSynthesis.speak(utter);
         setTimeout(finish, 10000);
       });
     }
 
-    function getActiveIndexes(){
-      if(singleLoopIndex !== null){
-        return [singleLoopIndex];
-      }
+    function activeIndexes(){
+      if(singleLoopIndex !== null) return [singleLoopIndex];
       return [0,1,2,3].filter(i => normalize(wordInputs[i].value));
     }
 
     async function runLoop(myToken){
       while(running && myToken === loopToken){
-        const active = getActiveIndexes();
+        const active = activeIndexes();
         if(active.length === 0){
           statusEl.textContent = "请至少输入 1 个单词";
           running = false;
-          updateBigDisplay(null);
+          updateBig(null);
           return;
         }
-
         for(const idx of active){
           if(!running || myToken !== loopToken) return;
-          const word = normalize(wordInputs[idx].value);
-          statusEl.textContent = singleLoopIndex === idx ? `单循环中：${word}` : `正在朗读：${word}`;
+          const w = normalize(wordInputs[idx].value);
+          statusEl.textContent = singleLoopIndex === idx ? `单循环中：${w}` : `正在朗读：${w}`;
           await speakIndex(idx);
           if(!running || myToken !== loopToken) return;
-          await sleep(parseInt(gapEl.value, 10));
+          await sleep(1000);
         }
       }
     }
 
+    restoreState();
+    syncLoopUI();
+    renderLearned();
+    updateBig(null);
+
+    [...wordInputs, ...meaningInputs].forEach(el => el.addEventListener("input", saveState));
+
+    loopEls.forEach(el => {
+      el.addEventListener("change", () => {
+        const idx = parseInt(el.dataset.index, 10);
+        singleLoopIndex = el.checked ? idx : null;
+        syncLoopUI();
+        saveState();
+        statusEl.textContent = singleLoopIndex === null ? "已关闭单循环" : `已开启第 ${idx + 1} 行单循环`;
+      });
+    });
+
+    document.querySelectorAll(".speak-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const idx = parseInt(btn.dataset.target, 10);
+        running = false;
+        loopToken++;
+        speechSynthesis.cancel();
+        statusEl.textContent = `试听：${normalize(wordInputs[idx].value) || "空"}`;
+        await speakIndex(idx);
+        statusEl.textContent = "准备好了";
+      });
+    });
+
     startBtn.addEventListener("click", async () => {
-      saveState();
-      speechSynthesis.cancel();
       running = false;
       loopToken++;
+      speechSynthesis.cancel();
       await sleep(80);
-
       running = true;
-      const myToken = loopToken;
-      runLoop(myToken);
+      runLoop(loopToken);
     });
 
     stopBtn.addEventListener("click", () => {
       running = false;
       loopToken++;
       speechSynthesis.cancel();
+      updateBig(null);
       statusEl.textContent = "已停止";
-      updateBigDisplay(null);
-    });
-
-    document.querySelectorAll(".speak-one").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const idx = parseInt(btn.dataset.target, 10);
-        running = false;
-        loopToken++;
-        speechSynthesis.cancel();
-        statusEl.textContent = `正在朗读：${normalize(wordInputs[idx].value) || "（空）"}`;
-        await speakIndex(idx);
-        statusEl.textContent = "准备好了";
-      });
     });
 
     saveLearnedBtn.addEventListener("click", () => {
       const idx = currentIndex !== null ? currentIndex : 0;
       const word = normalize(wordInputs[idx].value);
       const meaning = normalize(meaningInputs[idx].value);
-      if(!word){
-        statusEl.textContent = "没有可保存的单词";
-        return;
-      }
+      if(!word){ statusEl.textContent = "没有可加入的单词"; return; }
       if(!learnedWords.some(x => x.word === word)){
         learnedWords.push({word, meaning});
-        learnedWords.sort((a,b)=>a.word.localeCompare(b.word));
+        learnedWords.sort((a,b) => a.word.localeCompare(b.word));
         saveState();
-        renderLearnedWords();
+        renderLearned();
       }
-      statusEl.textContent = `已加入“已学过”：${word}`;
+      statusEl.textContent = `已加入已学：${word}`;
     });
 
     removeSelectedBtn.addEventListener("click", () => {
-      if(selectedLearned.length === 0){
-        statusEl.textContent = "请先选中要删除的单词";
-        return;
-      }
+      if(selectedLearned.length === 0){ statusEl.textContent = "请先选中要删除的单词"; return; }
       learnedWords = learnedWords.filter(x => !selectedLearned.includes(x.word));
       selectedLearned = [];
       saveState();
-      renderLearnedWords();
-      statusEl.textContent = "已删除选中的已学过单词";
+      renderLearned();
+      statusEl.textContent = "已删除选中单词";
     });
 
     clearLearnedBtn.addEventListener("click", () => {
       learnedWords = [];
       selectedLearned = [];
       saveState();
-      renderLearnedWords();
-      statusEl.textContent = "已清空“已学过”的单词";
+      renderLearned();
+      statusEl.textContent = "已清空已学单词";
     });
 
     window.addEventListener("beforeunload", () => speechSynthesis.cancel());
-
-    updateBigDisplay(null);
   </script>
 </body>
 </html>
