@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#0a1630">
-<title>单词神器</title>
+<title>太阳系-英语单词</title>
 <style>
 :root{--panel:#0d1a33;--border:#294873;--text:#f7fbff;--sub:#9fb1cd;--green:#39cc9b;--red:#f36f74}
 *{box-sizing:border-box}
@@ -55,7 +55,7 @@ select{width:100%;height:30px;background:#0d1a33;color:#fff;border:1px solid #27
 .drawer{position:fixed;left:0;top:0;bottom:0;width:min(78vw,320px);background:#0b162a;border-right:1px solid #294873;transform:translateX(-102%);transition:transform .2s ease;z-index:31;padding:calc(env(safe-area-inset-top,0) + 12px) 12px calc(env(safe-area-inset-bottom,0) + 12px);overflow-y:auto;box-shadow:8px 0 24px rgba(0,0,0,.35)}
 .drawer.open{transform:translateX(0)}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.drawer-title{font-size:18px;font-weight:900}
+.drawer-title{font-size:18px;font-weight:900}.drawer-version{font-size:12px;color:#f24833;margin-left:8px}
 .drawer-close{width:34px;height:34px;border-radius:10px;border:1px solid #36537d;background:#101d33;color:#fff;font-size:20px;cursor:pointer}
 .drawer-section{padding:12px 0;border-top:1px solid #203a62}.drawer-section:first-of-type{border-top:0}
 .drawer-label{font-size:12px;color:#7fa9ec;font-weight:900;margin-bottom:8px}
@@ -63,6 +63,16 @@ select{width:100%;height:30px;background:#0d1a33;color:#fff;border:1px solid #27
 .drawer-btn{min-height:38px;border:1px solid #36537d;border-radius:11px;background:#101d33;color:#fff;font-size:13px;font-weight:800;cursor:pointer}
 .drawer-btn.danger{border-color:#713947;color:#ffb7c0}
 .drawer-placeholder{font-size:12px;line-height:1.45;color:#8190a6}
+.drawer-status{margin-top:8px;font-size:11px;color:#86b3ff;min-height:16px}
+
+.modal-scrim{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;align-items:center;justify-content:center;z-index:40;padding:18px}
+.modal-scrim.open{display:flex}
+.modal{width:min(92vw,360px);background:#0c1a31;border:1px solid #36537d;border-radius:15px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.modal-title{font-size:17px;font-weight:900;margin-bottom:8px}
+.modal-text{font-size:13px;line-height:1.45;color:#aab9cf;margin-bottom:14px}
+.modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.modal-btn{height:40px;border-radius:11px;border:1px solid #36537d;background:#101d33;color:#fff;font-weight:800;cursor:pointer}
+.modal-btn.confirm-danger{border-color:#7a3e4c;color:#ffb7c0}
 
 @media(max-width:430px){
   .word-row{grid-template-columns:25px minmax(82px,1.25fr) minmax(56px,.9fr) 56px 36px;gap:3px}
@@ -75,9 +85,7 @@ select{width:100%;height:30px;background:#0d1a33;color:#fff;border:1px solid #27
 
 <div class="app">
   <section class="panel hero">
-    <button id="menuBtn" class="menu-btn" aria-label="打开系统菜单">
-      <span class="menu-lines"><i></i><i></i><i></i></span>
-    </button>
+    <button id="menuBtn" class="menu-btn" aria-label="打开系统菜单"><span class="menu-lines"><i></i><i></i><i></i></span></button>
     <div class="hero-word-wrap" id="heroWordWrap"><div class="hero-word" id="heroWord">remember</div></div>
     <div class="hero-cn" id="heroCn">记住</div>
   </section>
@@ -99,6 +107,7 @@ select{width:100%;height:30px;background:#0d1a33;color:#fff;border:1px solid #27
       <div class="field">
         <label for="rate">朗读速度</label>
         <select id="rate">
+          <option value="extreme">极慢 · 拆字母</option>
           <option value="0.35">很慢</option>
           <option value="0.58">慢</option>
           <option value="0.88">正常偏慢</option>
@@ -124,21 +133,37 @@ select{width:100%;height:30px;background:#0d1a33;color:#fff;border:1px solid #27
 <div id="scrim" class="scrim"></div>
 <aside id="drawer" class="drawer" aria-hidden="true">
   <div class="drawer-head">
-    <div class="drawer-title">系统菜单</div>
+    <div><span class="drawer-title">太阳系-英语单词</span><span class="drawer-version">V1.2</span></div>
     <button id="closeDrawer" class="drawer-close">×</button>
   </div>
+
   <div class="drawer-section">
     <div class="drawer-label">已学单词管理</div>
     <div class="drawer-grid">
       <button id="undoLast" class="drawer-btn">撤回最后</button>
       <button id="clearLearned" class="drawer-btn danger">清空已学</button>
+      <button id="copyAll" class="drawer-btn">一键复制全部</button>
+      <button id="exportTxt" class="drawer-btn">导出 TXT</button>
     </div>
+    <div id="drawerStatus" class="drawer-status"></div>
   </div>
+
   <div class="drawer-section">
     <div class="drawer-label">以后系统功能</div>
     <div class="drawer-placeholder">以后新增的配置、系统设置、数据管理、外观选项、导入/导出等功能，都放在这里，不再占用主学习界面。</div>
   </div>
 </aside>
+
+<div id="confirmModal" class="modal-scrim" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div id="modalTitle" class="modal-title">确认操作</div>
+    <div id="modalText" class="modal-text"></div>
+    <div class="modal-actions">
+      <button id="modalCancel" class="modal-btn">取消</button>
+      <button id="modalConfirm" class="modal-btn confirm-danger">确认</button>
+    </div>
+  </div>
+</div>
 
 <script>
 const DEFAULTS=[["apple","苹果"],["beautiful","美丽的"],["future","未来"],["remember","记住"],["",""],["",""],["",""],["",""],["",""],["",""],["",""],["",""]];
@@ -153,17 +178,28 @@ const rateEl=document.getElementById("rate");
 const startBtn=document.getElementById("startBtn");
 const stopBtn=document.getElementById("stopBtn");
 const learnedList=document.getElementById("learnedList");
+
 const menuBtn=document.getElementById("menuBtn");
 const drawer=document.getElementById("drawer");
 const scrim=document.getElementById("scrim");
 const closeDrawer=document.getElementById("closeDrawer");
 const undoLast=document.getElementById("undoLast");
 const clearLearned=document.getElementById("clearLearned");
+const copyAll=document.getElementById("copyAll");
+const exportTxt=document.getElementById("exportTxt");
+const drawerStatus=document.getElementById("drawerStatus");
 
-let voices=[],running=false,token=0,singleIndex=null,learned=[];
+const confirmModal=document.getElementById("confirmModal");
+const modalTitle=document.getElementById("modalTitle");
+const modalText=document.getElementById("modalText");
+const modalCancel=document.getElementById("modalCancel");
+const modalConfirm=document.getElementById("modalConfirm");
+
+let voices=[],running=false,token=0,singleIndex=null,learned=[],pendingConfirm=null;
 
 function clean(v){return(v||"").trim()}
 function key(v){return clean(v).toLowerCase()}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
 function buildRows(){
   rowsEl.innerHTML="";
@@ -192,13 +228,12 @@ function loadVoices(){voices=speechSynthesis.getVoices()}
 loadVoices();
 if("onvoiceschanged"in speechSynthesis)speechSynthesis.onvoiceschanged=loadVoices;
 
-/* 一眼记：保持正常比例，单词尽量填满整个可用区域 */
+/* 一眼记：正常比例，尽量填满可用区域 */
 function fitHero(){
   const maxW=Math.max(20,heroWordWrap.clientWidth-8);
   const maxH=Math.max(20,heroWordWrap.clientHeight-2);
-  let lo=20,hi=320,best=20;
-
-  for(let n=0;n<16;n++){
+  let lo=20,hi=340,best=20;
+  for(let n=0;n<17;n++){
     const mid=(lo+hi)/2;
     heroWord.style.fontSize=mid+"px";
     const r=heroWord.getBoundingClientRect();
@@ -206,23 +241,22 @@ function fitHero(){
   }
   heroWord.style.fontSize=best+"px";
 }
-
-function showWord(i){
-  heroWord.textContent=clean(enInputs[i].value)||"READY";
-  heroCn.textContent=clean(cnInputs[i].value)||"";
+function showText(word,cn=""){
+  heroWord.textContent=clean(word)||"READY";
+  heroCn.textContent=clean(cn);
   requestAnimationFrame(fitHero);
 }
+function showWord(i){showText(enInputs[i].value,cnInputs[i].value)}
 
 function save(){
-  localStorage.setItem("word_magic_strong_ui_v2",JSON.stringify({
+  localStorage.setItem("word_magic_strong_ui_v3",JSON.stringify({
     items:enInputs.map((e,i)=>[e.value,cnInputs[i].value]),
     singleIndex,gap:gapEl.value,rate:rateEl.value,learned
   }));
 }
-
 function restore(){
   let data=null;
-  try{data=JSON.parse(localStorage.getItem("word_magic_strong_ui_v2")||"null")}catch(e){}
+  try{data=JSON.parse(localStorage.getItem("word_magic_strong_ui_v3")||"null")}catch(e){}
   const items=data?.items||DEFAULTS;
   for(let i=0;i<12;i++){enInputs[i].value=items[i]?.[0]||"";cnInputs[i].value=items[i]?.[1]||""}
   if(Number.isInteger(data?.singleIndex))singleIndex=data.singleIndex;
@@ -231,18 +265,22 @@ function restore(){
   if(Array.isArray(data?.learned))learned=data.learned;
   syncSingles();renderLearned();showWord(3);
 }
-
 function syncSingles(){singles.forEach((s,i)=>s.checked=(i===singleIndex))}
-function autoTranslate(i){
-  const found=DICT[key(enInputs[i].value)];
-  if(found&&!clean(cnInputs[i].value))cnInputs[i].value=found;
-}
+
 enInputs.forEach((el,i)=>{
-  el.addEventListener("input",()=>{if(!clean(cnInputs[i].value)){const f=DICT[key(el.value)];if(f)cnInputs[i].value=f}save()});
-  el.addEventListener("blur",()=>{autoTranslate(i);save()});
+  el.addEventListener("input",()=>{
+    if(!clean(cnInputs[i].value)){const f=DICT[key(el.value)];if(f)cnInputs[i].value=f}
+    save()
+  });
+  el.addEventListener("blur",()=>{
+    const f=DICT[key(el.value)];
+    if(f&&!clean(cnInputs[i].value))cnInputs[i].value=f;
+    save()
+  });
 });
 cnInputs.forEach(el=>el.addEventListener("input",save));
-gapEl.addEventListener("change",save);rateEl.addEventListener("change",save);
+gapEl.addEventListener("change",save);
+rateEl.addEventListener("change",save);
 singles.forEach((el,i)=>el.addEventListener("change",()=>{singleIndex=el.checked?i:null;syncSingles();save()}));
 
 function addLearned(i){
@@ -253,33 +291,82 @@ function addLearned(i){
 function renderLearned(){
   learnedList.innerHTML="";
   if(!learned.length){
-    const e=document.createElement("div");e.className="empty";e.textContent="还没有已学过单词；朗读过的单词会自动保存在这里。";learnedList.appendChild(e);return;
+    const e=document.createElement("div");
+    e.className="empty";
+    e.textContent="还没有已学过单词；朗读过的单词会自动保存在这里。";
+    learnedList.appendChild(e);
+    return;
   }
   learned.forEach(item=>{
     const b=document.createElement("button");
-    b.className="chip";b.type="button";b.textContent=item.word;b.title=item.cn?`${item.word} · ${item.cn}`:item.word;
+    b.className="chip";b.type="button";b.textContent=item.word;
+    b.title=item.cn?`${item.word} · ${item.cn}`:item.word;
     b.addEventListener("click",()=>speakText(item.word,item.cn));
     learnedList.appendChild(b);
   });
 }
 
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
-function speakText(word,cn=""){
+/* 普通语速 */
+function speakUtterance(text,rate){
   return new Promise(resolve=>{
-    word=clean(word);if(!word){resolve();return}
-    heroWord.textContent=word;heroCn.textContent=clean(cn);requestAnimationFrame(fitHero);
-    const u=new SpeechSynthesisUtterance(word);
-    u.lang="en-US";u.rate=parseFloat(rateEl.value);u.pitch=1;
+    const u=new SpeechSynthesisUtterance(text);
+    u.lang="en-US";u.rate=rate;u.pitch=1;
     const v=getUSVoice();if(v)u.voice=v;
     let done=false;
     const finish=()=>{if(!done){done=true;resolve()}};
     u.onend=finish;u.onerror=finish;
-    speechSynthesis.cancel();speechSynthesis.speak(u);
+    speechSynthesis.speak(u);
     setTimeout(finish,15000);
   });
 }
-async function speakIndex(i,autoSave=true){showWord(i);if(autoSave)addLearned(i);await speakText(enInputs[i].value,cnInputs[i].value)}
-document.querySelectorAll(".spk").forEach(btn=>btn.addEventListener("click",async()=>{running=false;token++;await speakIndex(Number(btn.dataset.i),true)}));
+
+/* 极慢：先整词超慢，再逐字母分解，达到明显“拆音/拆字母”的效果 */
+async function speakExtreme(word){
+  speechSynthesis.cancel();
+  await speakUtterance(word,0.22);
+  if(!running && token<0)return;
+
+  const chars=[...word].filter(ch=>/[A-Za-z]/.test(ch));
+  if(chars.length){
+    await sleep(180);
+    for(const ch of chars){
+      if(!ch)continue;
+      await speakUtterance(ch,0.45);
+      await sleep(120);
+    }
+  }
+}
+
+function speakText(word,cn=""){
+  return new Promise(async resolve=>{
+    word=clean(word);
+    if(!word){resolve();return}
+    showText(word,cn);
+
+    speechSynthesis.cancel();
+    const mode=rateEl.value;
+
+    if(mode==="extreme"){
+      await speakExtreme(word);
+      resolve();
+      return;
+    }
+
+    await speakUtterance(word,parseFloat(mode));
+    resolve();
+  });
+}
+
+async function speakIndex(i,autoSave=true){
+  showWord(i);
+  if(autoSave)addLearned(i);
+  await speakText(enInputs[i].value,cnInputs[i].value);
+}
+
+document.querySelectorAll(".spk").forEach(btn=>btn.addEventListener("click",async()=>{
+  running=false;token++;
+  await speakIndex(Number(btn.dataset.i),true);
+}));
 
 function active(){
   if(singleIndex!==null)return clean(enInputs[singleIndex].value)?[singleIndex]:[];
@@ -287,7 +374,8 @@ function active(){
 }
 async function run(myToken){
   while(running&&myToken===token){
-    const list=active();if(!list.length){running=false;return}
+    const list=active();
+    if(!list.length){running=false;return}
     for(const i of list){
       if(!running||myToken!==token)return;
       await speakIndex(i,true);
@@ -296,21 +384,95 @@ async function run(myToken){
     }
   }
 }
-startBtn.addEventListener("click",async()=>{running=false;token++;speechSynthesis.cancel();await sleep(80);running=true;const t=++token;run(t)});
-stopBtn.addEventListener("click",()=>{running=false;token++;speechSynthesis.cancel()});
+startBtn.addEventListener("click",async()=>{
+  running=false;token++;speechSynthesis.cancel();await sleep(80);
+  running=true;const t=++token;run(t)
+});
+stopBtn.addEventListener("click",()=>{
+  running=false;token++;speechSynthesis.cancel()
+});
 
-function openDrawer(){drawer.classList.add("open");scrim.classList.add("open");drawer.setAttribute("aria-hidden","false")}
+/* 侧窗 */
+function openDrawer(){drawer.classList.add("open");scrim.classList.add("open");drawer.setAttribute("aria-hidden","false");drawerStatus.textContent=""}
 function closeDrawerFn(){drawer.classList.remove("open");scrim.classList.remove("open");drawer.setAttribute("aria-hidden","true")}
-menuBtn.addEventListener("click",openDrawer);closeDrawer.addEventListener("click",closeDrawerFn);scrim.addEventListener("click",closeDrawerFn);
+menuBtn.addEventListener("click",openDrawer);
+closeDrawer.addEventListener("click",closeDrawerFn);
+scrim.addEventListener("click",closeDrawerFn);
 
-undoLast.addEventListener("click",()=>{if(learned.length){learned.pop();save();renderLearned()}});
-clearLearned.addEventListener("click",()=>{learned=[];save();renderLearned()});
+/* 确认窗口 */
+function askConfirm(title,text,onConfirm){
+  modalTitle.textContent=title;
+  modalText.textContent=text;
+  pendingConfirm=onConfirm;
+  confirmModal.classList.add("open");
+}
+function closeConfirm(){confirmModal.classList.remove("open");pendingConfirm=null}
+modalCancel.addEventListener("click",closeConfirm);
+confirmModal.addEventListener("click",e=>{if(e.target===confirmModal)closeConfirm()});
+modalConfirm.addEventListener("click",()=>{
+  const fn=pendingConfirm;
+  closeConfirm();
+  if(fn)fn();
+});
+
+undoLast.addEventListener("click",()=>{
+  if(!learned.length){drawerStatus.textContent="当前没有已学单词。";return}
+  const last=learned[learned.length-1];
+  askConfirm("撤回最后一个？",`将从已学单词中移除：${last.word}${last.cn?" · "+last.cn:""}`,()=>{
+    learned.pop();save();renderLearned();drawerStatus.textContent="已撤回最后一个。"
+  });
+});
+
+clearLearned.addEventListener("click",()=>{
+  if(!learned.length){drawerStatus.textContent="当前没有已学单词。";return}
+  askConfirm("清空全部已学单词？",`将删除当前保存的 ${learned.length} 个已学单词。此操作不可自动恢复。`,()=>{
+    learned=[];save();renderLearned();drawerStatus.textContent="已清空全部已学单词。"
+  });
+});
+
+/* 一键复制全部 */
+function learnedText(){
+  return learned.map(x=>x.cn?`${x.word}\t${x.cn}`:x.word).join("\n");
+}
+copyAll.addEventListener("click",async()=>{
+  if(!learned.length){drawerStatus.textContent="当前没有可复制的已学单词。";return}
+  const text=learnedText();
+  try{
+    await navigator.clipboard.writeText(text);
+    drawerStatus.textContent=`已复制 ${learned.length} 个单词。`;
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");drawerStatus.textContent=`已复制 ${learned.length} 个单词。`}
+    catch(err){drawerStatus.textContent="复制失败，请重试。"}
+    ta.remove();
+  }
+});
+
+/* 导出 TXT */
+exportTxt.addEventListener("click",()=>{
+  if(!learned.length){drawerStatus.textContent="当前没有可导出的已学单词。";return}
+  const header="太阳系-英语单词 · 已学单词\n\n";
+  const blob=new Blob([header+learnedText()+"\n"],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  const d=new Date();
+  const stamp=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  a.download=`已学单词-${stamp}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  drawerStatus.textContent=`已生成 TXT，共 ${learned.length} 个单词。`;
+});
 
 window.addEventListener("resize",fitHero);
 window.addEventListener("orientationchange",()=>setTimeout(fitHero,150));
 window.addEventListener("beforeunload",()=>speechSynthesis.cancel());
 
-restore();fitHero();
+restore();
+fitHero();
 </script>
 </body>
 </html>
